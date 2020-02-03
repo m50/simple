@@ -33,5 +33,5 @@ mv simple.phar /usr/local/bin/simple
 ### Composer
 
 ```sh
-composer require --dev m50/simple
+composer global require m50/simple
 ```
