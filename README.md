@@ -2,7 +2,10 @@
 
 The documentation verification tool to make sure that nothing is considered easy or simple.
 
-Run *Simple* in your CI process on your documentation to make sure you don't put out any documentation that is condescending or unhelpful to learners. Everywhere that *Simple* finds any of the problematic words, it may be a perfect case to more detailed documentation.
+Run *Simple* in your CI process on your documentation to make sure you don't put
+out any documentation that is condescending or unhelpful to learners. Everywhere
+that *Simple* finds any of the problematic words, it may be a perfect case to
+provide more detailed documentation.
 
 ## Usage
 
