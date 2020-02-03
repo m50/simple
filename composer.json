@@ -1,10 +1,43 @@
 {
+    "name": "m50/simple",
+    "description": "The documentation verification tool to make sure that nothing is considered easy or simple.",
+    "keywords": ["documentation", "cd", "cicd", "verification", "simple"],
+    "license": "MIT",
+    "homepage": "https://github.com/m50/simple",
+    "authors": [
+        {
+            "name": "Marisa Clardy",
+            "email": "marisa@clardy.eu"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "symfony/console": "^5.0",
+        "symfony/finder": "^5.0",
+        "symfony/yaml": "^5.0"
+    },
     "require-dev": {
         "phpunit/phpunit": "^8.5",
         "vimeo/psalm": "^3.8"
     },
-    "require": {
-        "symfony/console": "^5.0",
-        "symfony/finder": "^5.0"
+    "autoload": {
+        "psr-4": {
+            "NotSoSimple\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "bin": "simple",
+    "scripts": {
+        "test": "php ./vendor/bin/phpunit",
+        "typecheck": "php ./vendor/bin/psalm"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true
     }
 }
