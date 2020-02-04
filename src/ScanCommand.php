@@ -2,6 +2,9 @@
 
 namespace NotSoSimple;
 
+use Exception;
+use NotSoSimple\Config\ReportConfig;
+use NotSoSimple\DataObjects\Cwd;
 use NotSoSimple\Exceptions\UnableToLoadConfigException;
 use NotSoSimple\Reports\HtmlReport;
 use NotSoSimple\Reports\JsonReport;
@@ -15,12 +18,14 @@ final class ScanCommand extends SymfonyCommand
 {
     protected static $defaultName = 'scan';
 
+    protected Config $config;
+
     private const OPTIONS = [
         [
-            'dir',
-            'd',
+            'files',
+            'f',
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-            'The directory that the files are stored in. Defaults to current working directory.'
+            'The files or directories that are to be scanned.'
         ],
         ['ext', 'e', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'The extension(s) to be scanned.'],
         ['no-color', 'n', InputOption::VALUE_NONE, 'Disable color output.'],
@@ -28,13 +33,13 @@ final class ScanCommand extends SymfonyCommand
             'config',
             'c',
             InputOption::VALUE_REQUIRED,
-            'The config file to use. Defaults to "simple.yaml" in the (first) directory to scan.'
+            'The config file to use. Defaults to "simple.yaml" in the current working directory.'
         ],
         [
             'gen-config',
             null,
             InputOption::VALUE_NONE,
-            'Generate a new config as "simple.yaml" in the (first) directory to scan.'
+            'Generate a new config as "simple.yaml" in the current working directory.'
         ],
         ['report-format', null, InputOption::VALUE_REQUIRED, 'The format for the report (json, junit, html).'],
         [
@@ -44,6 +49,12 @@ final class ScanCommand extends SymfonyCommand
             'The file to output the report to (Note: Formatting can be implied by extension).'
         ],
     ];
+
+    public function __construct(?string $name = null)
+    {
+        $this->config = new Config('');
+        parent::__construct($name);
+    }
 
     /**
      * Configures the command.
@@ -80,7 +91,7 @@ final class ScanCommand extends SymfonyCommand
             return Config::generate($workingDirs[0]);
         }
 
-        $config = new Config($this->getConfigFile($workingDirs, $input));
+        $this->config = new Config($this->getConfigFile($input));
 
         $errors = [];
         foreach ($workingDirs as $dir) {
@@ -99,15 +110,13 @@ final class ScanCommand extends SymfonyCommand
 
     private function genReport(array $errors, InputInterface $input): void
     {
+        $report = $this->config->getReport();
         /** @var string|null $reportFile */
-        $reportFile = $input->getOption('report-file');
+        $reportFile = $input->getOption('report-file') ?? $report->output();
         if (is_null($reportFile)) {
             return;
         }
-        $reportFormat = $this->getReportFormat($input, $reportFile);
-        if (is_null($reportFormat)) {
-            return;
-        }
+        $reportFormat = $this->getReportFormat($input, $reportFile) ?? $report->format();
 
         switch ($reportFormat) {
             case 'json':
@@ -123,21 +132,18 @@ final class ScanCommand extends SymfonyCommand
 
     private function getReportFormat(InputInterface $input, string $reportFile): ?string
     {
-        /** @var string|null $reportFormat */
-        $reportFormat = $input->getOption('report-format');
+        try {
+            /** @var string|null $reportFormat */
+            $reportFormat = $input->getOption('report-format');
 
-        if (is_null($reportFormat)) {
-            if (preg_match('/\.(json|xml|html)$/i', $reportFile, $matches)) {
-                [,$reportFormat] = $matches;
-                if ($$reportFormat === 'xml') {
-                    $reportFormat = 'junit';
-                }
-            } else {
-                return null;
+            if (is_null($reportFormat)) {
+                $reportFormat = ReportConfig::getReportFormat($reportFile);
             }
-        }
 
-        $reportFormat = strtolower($reportFormat);
+            $reportFormat = strtolower($reportFormat);
+        } catch (Exception $e) {
+            return null;
+        }
 
         return $reportFormat;
     }
@@ -168,16 +174,15 @@ final class ScanCommand extends SymfonyCommand
     /**
      * Get the config file path.
      *
-     * @param string[] $workingDirs
      * @param InputInterface $input
      * @return string
      */
-    private function getConfigFile(array $workingDirs, InputInterface $input): string
+    private function getConfigFile(InputInterface $input): string
     {
         /** @var string|null $configFile */
         $configFile = $input->getOption('config');
         if (is_null($configFile)) {
-            $configFile = $workingDirs[0] . PATH_SEPARATOR . 'simple.yaml';
+            $configFile = Cwd::get() . PATH_SEPARATOR . 'simple.yaml';
         }
 
         return $configFile;
@@ -185,9 +190,9 @@ final class ScanCommand extends SymfonyCommand
 
     private function genHelp(): string
     {
-        return 'Run *Simple* in your CI process on your documentation to make ' .
+        return 'Run <info>Simple</info> in your CI process on your documentation to make ' .
             'sure you don\'t put out any documentation that is condescending or ' .
-            "unhelpful to learners.\nEverywhere that *Simple* finds any of the " .
+            "unhelpful to learners.\nEverywhere that <info>Simple</info> finds any of the " .
             'problematic words, it may be a perfect case to provide more detailed documentation.';
     }
 }
