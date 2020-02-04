@@ -1,0 +1,29 @@
+shortcircuit: false
+report:
+  format: junit
+  output: ./report.xml
+files:
+  - path: ./content/
+    recursive: true
+extensions:
+  - md
+  - markdown
+  - html
+  - htm
+  - txt
+problems:
+  - key: simple
+    regex: /simpl[ey]/i
+    weight: 3
+  - key: easy
+    regex: /eas(?:y|ily)/i
+    weight: 3
+  - key: quickly
+    regex: /quick(?:ly)?/i
+    weight: 2
+  - key: real quick
+    regex: /real quick/i
+    weight: 1
+  - key: todo
+    regex: /\btodo\b/i
+    weight: 3
