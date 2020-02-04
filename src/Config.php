@@ -2,37 +2,65 @@
 
 namespace NotSoSimple;
 
+use NotSoSimple\Config\ConfigInterface;
+use NotSoSimple\Config\ReportConfig;
+use NotSoSimple\Config\FileConfig;
+use NotSoSimple\Config\ProblemConfig;
 use NotSoSimple\Exceptions\UnableToLoadConfigException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
-final class Config
+final class Config implements ConfigInterface
 {
-    private bool $recursive = true;
-    /** @var array<string,string> $problemRegexs */
-    private array $problemRegexes = [
-        'simple'     => '/simpl[ey]/i',
-        'easy'       => '/eas(?:y|ily)/i',
-        'quickly'    => '/quickly/i',
-        'real quick' => '/real quick/i',
-        'todo'       => '/\btodo\b/i',
+    private bool $shortcircuit = false;
+
+    private ReportConfig $report;
+
+    /** @var array<FileConfig> */
+    private array $files = [];
+
+    /** @var array<ProblemConfig> */
+    private array $problems = [];
+
+    /** @var array<string> */
+    private array $extensions = [
+        'md',
+        'markdown',
+        'html',
+        'htm',
+        'txt',
     ];
 
     public function __construct(string $file = 'simple.yaml')
     {
+        $this->report = new ReportConfig('', '');
+        $this->problems = [
+            new ProblemConfig('simple', '/simpl[ey]/i', 3),
+            new ProblemConfig('easy', '/eas(?:y|ily)/i', 3),
+            new ProblemConfig('quickly', '/quick(?:ly)?/i', 2),
+            new ProblemConfig('real quick', '/real quick/i', 1),
+            new ProblemConfig('todo', '/\btodo\b/i', 3),
+        ];
+        $this->files = [
+            new FileConfig('./content/', true),
+        ];
+
+        if (empty($file)) {
+            return;
+        }
+
         try {
-            /** @var array<string,mixed> $yaml */
+            /** @var array<string,bool|array<string,string>|array<string>|array<array<string,string|int|bool>>> $yaml */
             $yaml = Yaml::parseFile($file);
             $this->parseConfig($yaml);
         } catch (ParseException $exception) {
-            // We don't really care if the config file doesn't exist, we will
-            //  use our default config in that case.
+            throw new UnableToLoadConfigException("Unable to parse file ({$file}). Does it exist?", 15, $exception);
         }
     }
 
     public static function generate(string $dir): int
     {
-        $yaml = Yaml::dump((new static)->toArray());
+        $yaml = Yaml::dump((new static(''))->toArray());
         $ret = file_put_contents($dir . PATH_SEPARATOR . 'simple.yaml', $yaml);
 
         if ($ret === false) {
@@ -42,64 +70,110 @@ final class Config
         return 0;
     }
 
-    public function toArray(): array
+    public function getReport(): ReportConfig
     {
-        $methods = get_class_methods($this);
-        $arr = [];
-        foreach ($methods as $method) {
-            if (preg_match('/^get([A-Z]\w+)$/', $method, $matches)) {
-                $arr[lcfirst($matches[1])] = $this->$method();
-            }
-        }
-
-        return $arr;
-    }
-
-    public function getRecursive(): bool
-    {
-        return $this->recursive;
-    }
-
-    public function getProblemRegularExpressions(): array
-    {
-        return $this->problemRegexes;
-    }
-
-    private function setRecursive(bool $recursive): void
-    {
-        $this->recursive = $recursive;
+        return $this->report;
     }
 
     /**
-     * @param array<string,string> $problemRegexes
-     * @return void
+     * @psalm-mutation-free
+     * @return array<string,mixed>
      */
-    private function setProblemRegularExpressions(array $problemRegexes): void
+    public function toArray(): array
     {
-        foreach ($problemRegexes as $key => $value) {
-            if (! is_string($key)) {
-                throw new UnableToLoadConfigException('Invalid key for problem regular expressions', 33);
-            }
-            if (! is_string($value) || ! preg_match('/^\/.*\/[is]$/', $value)) {
-                throw new UnableToLoadConfigException('Invalid regular expression for problem regular expressions', 34);
-            }
-        }
-        $this->problemRegexes = $problemRegexes;
+        return [
+            'shortcircuit'  => $this->shortcircuit,
+            'report'        => $this->report->toArray(),
+            'files'         => array_map(static function (FileConfig $file): array {
+                return $file->toArray();
+            }, $this->files),
+            'problems'      => array_map(static function (ProblemConfig $problem): array {
+                return $problem->toArray();
+            }, $this->problems),
+            'extensions'    => $this->extensions,
+        ];
     }
 
     /**
      * Parse a config file
      *
-     * @param array<string,mixed> $config
+     * @param array<string,bool|array<string,string>|array<string>|array<array<string,string|int|bool>>> $config
      * @return void
      */
     private function parseConfig(array $config): void
     {
         foreach ($config as $key => $value) {
-            $setter = 'set' . ucfirst($key);
-            if (method_exists($this, $setter)) {
-                $this->$setter($value);
+            if ($key === 'shortcircuit') {
+                /** @var bool $value */
+                $this->shortcircuit = $value;
+            } elseif ($key === 'report') {
+                /** @var array<string,string> $value */
+                $value = $value; // This is needed to make psalm happy.
+                $this->setReport($value);
+            } elseif ($key === 'extensions') {
+                /** @var array<string> $value */
+                $this->extensions = $value;
+            } elseif ($key === 'files') {
+                /** @var array<array<string,string|bool>> $value */
+                $value = $value; // This is needed to make psalm happy.
+                $this->setFiles($value);
+            } elseif ($key === 'problems') {
+                /** @var array<array<string,string|bool>> $value */
+                $value = $value; // This is needed to make psalm happy.
+                $this->setFiles($value);
             }
+        }
+    }
+
+    /**
+     * @param array<string,string> $value
+     * @return void
+     */
+    private function setReport(array $value): void
+    {
+        /** @var string */
+        $format = '';
+        if (! isset($value['output'])) {
+            throw new UnableToLoadConfigException('Report option set but no output file provided.', 18);
+        }
+        if (isset($value['format'])) {
+            $format = $value['format'];
+        }
+        $this->report = new ReportConfig($value['output'], $format);
+    }
+
+    /**
+     * @param array<array<string,string|int>> $values
+     * @return void
+     */
+    public function setProblems(array $values): void
+    {
+        $this->problems = [];
+        /** @var array<string,string|int> $value */
+        foreach ($values as $value) {
+            /** @var int */
+            $weight = $value['weight'];
+            /** @var string */
+            $regex  = $value['regex'];
+            /** @var string */
+            $key    = $value['key'];
+            $this->problems[] = new ProblemConfig($key, $regex, $weight);
+        }
+    }
+    /**
+     * @param array<array<string,string|bool>> $values
+     * @return void
+     */
+    public function setFiles(array $values): void
+    {
+        $this->files = [];
+        /** @var array<string,string|bool> $value */
+        foreach ($values as $value) {
+            /** @var string */
+            $path = $value['path'];
+            /** @var bool */
+            $recursive = $value['recursive'];
+            $this->files[] = new FileConfig($path, $recursive);
         }
     }
 }
