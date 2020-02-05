@@ -5,6 +5,8 @@ report:
 files:
   - path: ./content/
     recursive: true
+exclude:
+  - vendor
 extensions:
   - md
   - markdown
