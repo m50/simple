@@ -2,14 +2,15 @@
 
 namespace NotSoSimple;
 
-use NotSoSimple\Config\ConfigInterface;
-use NotSoSimple\Config\ReportConfig;
-use NotSoSimple\Config\FileConfig;
-use NotSoSimple\Config\ProblemConfig;
 use NotSoSimple\DataObjects\Cwd;
-use NotSoSimple\Exceptions\UnableToLoadConfigException;
-use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use NotSoSimple\Config\FileConfig;
+use NotSoSimple\Config\ReportConfig;
+use NotSoSimple\Config\ExcludeConfig;
+use NotSoSimple\Config\ProblemConfig;
+use NotSoSimple\Config\ConfigInterface;
+use Symfony\Component\Yaml\Exception\ParseException;
+use NotSoSimple\Exceptions\UnableToLoadConfigException;
 
 final class Config implements ConfigInterface
 {
@@ -21,6 +22,9 @@ final class Config implements ConfigInterface
 
     /** @var array<FileConfig> */
     private array $files = [];
+
+    /** @var array<ExcludeConfig> */
+    private array $exclusions = [];
 
     /** @var array<ProblemConfig> */
     private array $problems = [];
@@ -45,7 +49,10 @@ final class Config implements ConfigInterface
             new ProblemConfig('todo', '/\btodo\b/i', 3),
         ];
         $this->files = [
-            new FileConfig(Cwd::get(), true),
+            new FileConfig(Cwd::get() . DIRECTORY_SEPARATOR, true),
+        ];
+        $this->exclusions = [
+            new ExcludeConfig('README.md', true),
         ];
 
         if (empty($file)) {
