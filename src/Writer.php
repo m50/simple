@@ -89,7 +89,7 @@ final class Writer
             return $text;
         }
 
-        $text = preg_replace('/<\/?\w+>/', '', $text);
+        $text = preg_replace('/<\/?[a-zA-Z=,]*>/', '', $text);
 
         if (is_null($text) || is_array($text)) {
             return '';
