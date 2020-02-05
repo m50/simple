@@ -39,7 +39,7 @@ final class FileConfig implements ConfigInterface
     public function toArray(): array
     {
         return [
-            'path'      => $this->path,
+            'path'      => str_replace(Cwd::get(), '.' . DIRECTORY_SEPARATOR, $this->path),
             'recursive' => $this->recursive,
         ];
     }
