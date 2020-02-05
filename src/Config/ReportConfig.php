@@ -15,7 +15,7 @@ final class ReportConfig implements ConfigInterface
         $this->output = $output;
         $this->format = $format;
 
-        if (empty($format)) {
+        if (empty($format) && ! empty($output)) {
             $this->format = self::getReportFormat($output);
         }
     }

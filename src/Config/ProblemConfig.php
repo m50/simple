@@ -43,4 +43,13 @@ final class ProblemConfig implements ConfigInterface
             'weight' => $this->weight,
         ];
     }
+
+    public function scanLine(string $line): bool
+    {
+        if (preg_match($this->regex, $line)) {
+            return true;
+        }
+        
+        return false;
+    }
 }

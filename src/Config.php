@@ -6,12 +6,15 @@ use NotSoSimple\Config\ConfigInterface;
 use NotSoSimple\Config\ReportConfig;
 use NotSoSimple\Config\FileConfig;
 use NotSoSimple\Config\ProblemConfig;
+use NotSoSimple\DataObjects\Cwd;
 use NotSoSimple\Exceptions\UnableToLoadConfigException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 final class Config implements ConfigInterface
 {
+    public const VERSION = '1.0.0';
+
     private bool $shortcircuit = false;
 
     private ReportConfig $report;
@@ -31,7 +34,7 @@ final class Config implements ConfigInterface
         'txt',
     ];
 
-    public function __construct(string $file = 'simple.yaml')
+    public function __construct(string $file = './simple.yaml')
     {
         $this->report = new ReportConfig('', '');
         $this->problems = [
@@ -42,11 +45,15 @@ final class Config implements ConfigInterface
             new ProblemConfig('todo', '/\btodo\b/i', 3),
         ];
         $this->files = [
-            new FileConfig('./content/', true),
+            new FileConfig(Cwd::get(), true),
         ];
 
         if (empty($file)) {
             return;
+        }
+
+        if (strpos($file, './') === 0) {
+            $file = str_replace('./', Cwd::get() . DIRECTORY_SEPARATOR, $file);
         }
 
         try {
@@ -60,19 +67,50 @@ final class Config implements ConfigInterface
 
     public static function generate(string $dir): int
     {
-        $yaml = Yaml::dump((new static(''))->toArray());
-        $ret = file_put_contents($dir . PATH_SEPARATOR . 'simple.yaml', $yaml);
+        $file = $dir . DIRECTORY_SEPARATOR . 'simple.yaml';
+
+        $config = (new static(''))->toArray();
+        $yaml = Yaml::dump($config, 4, 2);
+
+        $ret = file_put_contents($file, $yaml);
 
         if ($ret === false) {
-            return 1;
+            return 2;
         }
 
-        return 0;
+        if (file_exists($file)) {
+            return 0;
+        }
+
+        return 1;
     }
 
     public function getReport(): ReportConfig
     {
         return $this->report;
+    }
+
+    /**
+     * @return array<FileConfig>
+     */
+    public function getFiles(): array
+    {
+        return $this->files;
+    }
+
+    public function getExtensions(): array
+    {
+        return $this->extensions;
+    }
+
+    public function getProblems(): array
+    {
+        return $this->problems;
+    }
+
+    public function shortcircuit(): bool
+    {
+        return $this->shortcircuit;
     }
 
     /**
@@ -120,7 +158,7 @@ final class Config implements ConfigInterface
             } elseif ($key === 'problems') {
                 /** @var array<array<string,string|bool>> $value */
                 $value = $value; // This is needed to make psalm happy.
-                $this->setFiles($value);
+                $this->setProblems($value);
             }
         }
     }
