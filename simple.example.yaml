@@ -6,7 +6,10 @@ files:
   - path: ./content/
     recursive: true
 exclude:
-  - vendor
+  - pattern: vendor
+    file: false
+  - pattern: README.md
+    file: true
 extensions:
   - md
   - markdown
