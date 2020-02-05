@@ -3,13 +3,18 @@
 
 require_once "vendor/autoload.php";
 
-use NotSoSimple\ScanCommand;
+use NotSoSimple\Commands\InitCommand;
+use NotSoSimple\Commands\ScanCommand;
+use NotSoSimple\Config;
 use Symfony\Component\Console\Application;
 
-$application = new Application('simple', '1.0.0');
-$command = new ScanCommand();
+define('SIMPLE_START', microtime(true));
 
-$application->add($command);
+$application = new Application('simple', Config::VERSION);
+$application->setCatchExceptions(true);
 
-$application->setDefaultCommand($command->getName(), true);
+$application->add($scan = new ScanCommand());
+$application->add(new InitCommand());
+
+$application->setDefaultCommand($scan->getName());
 $application->run();
