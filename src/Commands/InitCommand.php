@@ -49,7 +49,7 @@ final class InitCommand extends Command
     {
         Writer::$output = $output;
         $this->handleConfig($input);
-        
+
         $response = Config::generate(Cwd::get());
 
         if ($response === 0) {
@@ -63,8 +63,8 @@ final class InitCommand extends Command
 
     private function handleConfig(InputInterface $input): void
     {
-        Writer::$quiet         = (bool) $input->getOption('quiet')           ?? false;
-        Writer::$noColor       = (bool) $input->getOption('no-color')        ?? false;
-        Writer::$noProgressBar = (bool) $input->getOption('no-progress-bar') ?? false;
+        Writer::$quiet         = (bool) ($input->getOption('quiet')           ?? false);
+        Writer::$noColor       = (bool) ($input->getOption('no-color')        ?? false);
+        Writer::$noProgressBar = (bool) ($input->getOption('no-progress-bar') ?? false);
     }
 }

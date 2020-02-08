@@ -49,6 +49,11 @@ final class FileReader
         return $this;
     }
 
+    /**
+     * @return Problem[]
+     *
+     * @psalm-return array<array-key, Problem>
+     */
     public function getErrors(): array
     {
         return $this->problems;

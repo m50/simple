@@ -22,45 +22,9 @@ final class Problem
         $this->lineNumber = $lineNumber;
     }
 
-    public function key(): string
-    {
-        return $this->key;
-    }
-
-    public function weight(): int
-    {
-        return $this->weight;
-    }
-
-    public function line(): string
-    {
-        return $this->line;
-    }
-
     public function lineNumber(): int
     {
         return $this->lineNumber;
-    }
-
-    public function number(): int
-    {
-        return $this->lineNumber();
-    }
-
-    public function fileName(): string
-    {
-        return $this->fileName;
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'file_name'  => $this->fileName,
-            'line'       => $this->line,
-            'lineNumber' => $this->lineNumber,
-            'key'        => $this->key,
-            'weight'     => $this->weight,
-        ];
     }
 
     public function format(): string

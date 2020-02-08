@@ -9,11 +9,13 @@ final class FileConfig implements ConfigInterface
 {
     protected string $path;
     protected bool $recursive;
+    protected string $cwd;
 
     public function __construct(string $path, bool $recursive)
     {
+        $this->cwd = Cwd::get();
         if (strpos($path, './') === 0) {
-            $path = str_replace('./', Cwd::get() . DIRECTORY_SEPARATOR, $path);
+            $path = str_replace('./', $this->cwd . DIRECTORY_SEPARATOR, $path);
         }
         if (strpos($path, '~/') === 0) {
             $path = str_replace('~/', (string)getenv('HOME') . DIRECTORY_SEPARATOR, $path);
@@ -24,7 +26,7 @@ final class FileConfig implements ConfigInterface
 
     public function path(): string
     {
-        return $this->path;
+        return (string)str_replace($this->cwd, '.', $this->path);
     }
 
     public function recursive(): bool
@@ -34,12 +36,12 @@ final class FileConfig implements ConfigInterface
 
     /**
      * @psalm-mutation-free
-     * @return array<string,mixed>
+     * @return array{path:string,recursive:bool}
      */
     public function toArray(): array
     {
         return [
-            'path'      => str_replace(Cwd::get(), '.' . DIRECTORY_SEPARATOR, $this->path),
+            'path'      => $this->path(),
             'recursive' => $this->recursive,
         ];
     }

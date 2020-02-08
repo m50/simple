@@ -8,13 +8,11 @@ use NotSoSimple\Commands\ScanCommand;
 use NotSoSimple\Config;
 use Symfony\Component\Console\Application;
 
-define('SIMPLE_START', microtime(true));
-
 $application = new Application('(Not So) Simple', Config::VERSION);
 $application->setCatchExceptions(true);
 
 $application->add($scan = new ScanCommand());
 $application->add(new InitCommand());
 
-$application->setDefaultCommand($scan->getName());
+$application->setDefaultCommand($scan->getName() ?? '');
 $application->run();

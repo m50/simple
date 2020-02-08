@@ -15,14 +15,6 @@ final class Writer
 
     private static ?ProgressBar $pb = null;
 
-    public static function write(string $text): void
-    {
-        if (static::$quiet) {
-            return;
-        }
-        static::$output->write(static::sanitize($text));
-    }
-
     public static function writeln(string $text): void
     {
         if (static::$quiet) {
@@ -46,7 +38,9 @@ final class Writer
             return;
         }
 
-        static::$pb->advance($step);
+        if (! is_null(static::$pb)) {
+            static::$pb->advance($step);
+        }
     }
 
     public static function pbFinish(): void
@@ -54,27 +48,18 @@ final class Writer
         if (static::$quiet || static::$noProgressBar) {
             return;
         }
-
-        static::$pb->finish();
+        if (! is_null(static::$pb)) {
+            static::$pb->finish();
+        }
 
         static::$pb = null;
 
         static::$output->writeln('');
     }
 
-    public static function info(string $info): void
-    {
-        static::$output->writeln(static::sanitize("<info>{$info}</info>"));
-    }
-
     public static function comment(string $comment): void
     {
         static::$output->writeln(static::sanitize("<comment>{$comment}</comment>"));
-    }
-
-    public static function error(string $error): void
-    {
-        static::$output->writeln(static::sanitize("<error>{$error}</error>"));
     }
 
     public static function escape(string $text): string
@@ -91,7 +76,7 @@ final class Writer
 
         $text = preg_replace('/<\/?[a-zA-Z=,]*>/', '', $text);
 
-        if (is_null($text) || is_array($text)) {
+        if (is_null($text)) {
             return '';
         }
 

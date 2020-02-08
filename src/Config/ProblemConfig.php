@@ -32,8 +32,11 @@ final class ProblemConfig implements ConfigInterface
     }
 
     /**
-     * @psalm-mutation-free
-     * @return array<string,mixed>
+     * @psalm-mutation-free 
+     *
+     * @return (int|string)[]
+     *
+     * @psalm-return array{key: string, regex: string, weight: int}
      */
     public function toArray(): array
     {

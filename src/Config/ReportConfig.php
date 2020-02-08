@@ -32,7 +32,10 @@ final class ReportConfig implements ConfigInterface
 
     /**
      * @psalm-mutation-free
-     * @return array<string,mixed>
+     *
+     * @return string[]|null
+     *
+     * @psalm-return array{format: string, output: string}
      */
     public function toArray(): array
     {
@@ -45,7 +48,6 @@ final class ReportConfig implements ConfigInterface
     /** @psalm-pure */
     public static function getReportFormat(string $reportFile): string
     {
-        $reportFormat = '';
         if (preg_match('/\.(json|xml|html)$/i', $reportFile, $matches)) {
             [,$reportFormat] = $matches;
             if ($reportFormat === 'xml') {
