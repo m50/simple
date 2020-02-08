@@ -27,14 +27,17 @@ final class ExcludeConfig implements ConfigInterface
         return $this->path;
     }
 
-    public function file(): bool
+    public function isFile(): bool
     {
         return $this->file;
     }
 
     /**
      * @psalm-mutation-free
-     * @return array<string,mixed>
+     *
+     * @return (bool|string)[]
+     *
+     * @psalm-return array{path: string, file: bool}
      */
     public function toArray(): array
     {

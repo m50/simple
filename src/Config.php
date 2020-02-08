@@ -64,7 +64,16 @@ final class Config implements ConfigInterface
         }
 
         try {
-            /** @var array<string,bool|array<string,string>|array<string>|array<array<string,string|int|bool>>> $yaml */
+            /**
+             * @var array{
+             *      shortcircuit: ?bool,
+             *      report: ?array<string,string>,
+             *      extensions: ?array<string>,
+             *      files: ?array<array{path:string,recursive:bool}>,
+             *      problems: ?array<array{weight:int,key:string,regex:string}>,
+             *      exclude: ?array<array{file:bool,pattern:string}>,
+             *  }
+             */
             $yaml = Yaml::parseFile($file);
             $this->parseConfig($yaml);
         } catch (ParseException $exception) {
@@ -78,6 +87,8 @@ final class Config implements ConfigInterface
 
         $config = (new static(''))->toArray();
         $yaml = Yaml::dump($config, 4, 2);
+
+        $yaml = str_replace("-\n    ", '- ', $yaml);
 
         $ret = file_put_contents($file, $yaml);
 
@@ -105,11 +116,25 @@ final class Config implements ConfigInterface
         return $this->files;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getExtensions(): array
     {
         return $this->extensions;
     }
 
+    /**
+     * @return array<ExcludeConfig>
+     */
+    public function getExclusions(): array
+    {
+        return $this->exclusions;
+    }
+
+    /**
+     * @return array<ProblemConfig>
+     */
     public function getProblems(): array
     {
         return $this->problems;
@@ -122,7 +147,6 @@ final class Config implements ConfigInterface
 
     /**
      * @psalm-mutation-free
-     * @return array<string,mixed>
      */
     public function toArray(): array
     {
@@ -132,6 +156,9 @@ final class Config implements ConfigInterface
             'files'         => array_map(static function (FileConfig $file): array {
                 return $file->toArray();
             }, $this->files),
+            'exclude'         => array_map(static function (ExcludeConfig $file): array {
+                return $file->toArray();
+            }, $this->exclusions),
             'problems'      => array_map(static function (ProblemConfig $problem): array {
                 return $problem->toArray();
             }, $this->problems),
@@ -142,31 +169,35 @@ final class Config implements ConfigInterface
     /**
      * Parse a config file
      *
-     * @param array<string,bool|array<string,string>|array<string>|array<array<string,string|int|bool>>> $config
+     * @param array{
+     *      shortcircuit: ?bool,
+     *      report: ?array<string,string>,
+     *      extensions: ?array<string>,
+     *      files: ?array<array{path:string, recursive:bool}>,
+     *      problems: ?array<array{weight: int, key: string, regex: string}>,
+     *      exclude: ?array<array{file: bool, pattern: string}>,
+     *  } $config
      * @return void
      */
     private function parseConfig(array $config): void
     {
-        foreach ($config as $key => $value) {
-            if ($key === 'shortcircuit') {
-                /** @var bool $value */
-                $this->shortcircuit = $value;
-            } elseif ($key === 'report') {
-                /** @var array<string,string> $value */
-                $value = $value; // This is needed to make psalm happy.
-                $this->setReport($value);
-            } elseif ($key === 'extensions') {
-                /** @var array<string> $value */
-                $this->extensions = $value;
-            } elseif ($key === 'files') {
-                /** @var array<array<string,string|bool>> $value */
-                $value = $value; // This is needed to make psalm happy.
-                $this->setFiles($value);
-            } elseif ($key === 'problems') {
-                /** @var array<array<string,string|bool>> $value */
-                $value = $value; // This is needed to make psalm happy.
-                $this->setProblems($value);
-            }
+        if (isset($config['files'])) {
+            $this->setFiles($config['files']);
+        }
+        if (isset($config['problems'])) {
+            $this->setProblems($config['problems']);
+        }
+        if (isset($config['exclude'])) {
+            $this->setExclusion($config['exclude']);
+        }
+        if (isset($config['shortcircuit'])) {
+            $this->shortcircuit = $config['shortcircuit'];
+        }
+        if (isset($config['report'])) {
+            $this->setReport($config['report']);
+        }
+        if (isset($config['extensions'])) {
+            $this->extensions = $config['extensions'];
         }
     }
 
@@ -188,7 +219,7 @@ final class Config implements ConfigInterface
     }
 
     /**
-     * @param array<array<string,string|int>> $values
+     * @param array<array{weight:int,key:string,regex:string}> $values
      * @return void
      */
     public function setProblems(array $values): void
@@ -206,19 +237,29 @@ final class Config implements ConfigInterface
         }
     }
     /**
-     * @param array<array<string,string|bool>> $values
+     * @param array<array{path:string,recursive:bool}> $values
      * @return void
      */
     public function setFiles(array $values): void
     {
         $this->files = [];
-        /** @var array<string,string|bool> $value */
         foreach ($values as $value) {
-            /** @var string */
             $path = $value['path'];
-            /** @var bool */
             $recursive = $value['recursive'];
             $this->files[] = new FileConfig($path, $recursive);
+        }
+    }
+    /**
+     * @param array<array{pattern:string,file:bool}> $values
+     * @return void
+     */
+    public function setExclusion(array $values): void
+    {
+        $this->files = [];
+        foreach ($values as $value) {
+            $pattern = $value['pattern'];
+            $file = $value['file'];
+            $this->exclusions[] = new ExcludeConfig($pattern, $file);
         }
     }
 }

@@ -4,6 +4,7 @@ namespace NotSoSimple\Commands;
 
 use Exception;
 use NotSoSimple\Config;
+use NotSoSimple\Config\ExcludeConfig;
 use NotSoSimple\Writer;
 use NotSoSimple\FileReader;
 use NotSoSimple\DataObjects\Cwd;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 final class ScanCommand extends SymfonyCommand
 {
+    private static float $START_TIME = 0;
     protected static $defaultName = 'scan';
 
     protected Config $config;
@@ -67,6 +69,7 @@ final class ScanCommand extends SymfonyCommand
 
     public function __construct(?string $name = null)
     {
+        self::$START_TIME = microtime(true);
         $this->config = new Config('');
         parent::__construct($name);
     }
@@ -94,6 +97,7 @@ final class ScanCommand extends SymfonyCommand
      *
      * @param InputInterface $input
      * @param OutputInterface $output
+     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -122,6 +126,9 @@ final class ScanCommand extends SymfonyCommand
         return count($errors) > 0 ? 1 : 0;
     }
 
+    /**
+     * @return array<Problem>
+     */
     private function scan(FileConfig $file): array
     {
         $problems = [];
@@ -162,6 +169,8 @@ final class ScanCommand extends SymfonyCommand
             $finder->depth(0);
         }
 
+        $this->handleExclusions($finder);
+
         if (is_dir($file->path())) {
             $finder->name($extensions)->in($file->path());
         } else {
@@ -171,11 +180,36 @@ final class ScanCommand extends SymfonyCommand
         return $finder;
     }
 
+    private function handleExclusions(Finder &$finder): void
+    {
+        $exclusions = $this->config->getExclusions();
+
+        $excludeFiles = array_map(static function (ExcludeConfig $config): string {
+            return $config->path();
+        }, array_filter($exclusions, static function (ExcludeConfig $config): bool {
+            return $config->isFile();
+        }));
+
+        $excludePaths = array_map(static function (ExcludeConfig $config): string {
+            return $config->path();
+        }, array_filter($exclusions, static function (ExcludeConfig $config): bool {
+            return ! $config->isFile();
+        }));
+
+        if (! empty($excludePaths)) {
+            $finder->exclude($excludePaths);
+        }
+
+        if (! empty($excludeFiles)) {
+            $finder->notName($excludeFiles);
+        }
+    }
+
     private function handleConfig(InputInterface $input): void
     {
-        Writer::$quiet         = (bool) $input->getOption('quiet')           ?? false;
-        Writer::$noColor       = (bool) $input->getOption('no-color')        ?? false;
-        Writer::$noProgressBar = (bool) $input->getOption('no-progress-bar') ?? false;
+        Writer::$quiet         = (bool) ($input->getOption('quiet')           ?? false);
+        Writer::$noColor       = (bool) ($input->getOption('no-color')        ?? false);
+        Writer::$noProgressBar = (bool) ($input->getOption('no-progress-bar') ?? false);
 
         $this->config = new Config($this->getConfigFile($input));
     }
@@ -212,7 +246,7 @@ final class ScanCommand extends SymfonyCommand
 
     private function outputTime(): void
     {
-        $time = microtime(true) - SIMPLE_START;
+        $time = (float) (microtime(true) - self::$START_TIME);
         Writer::writeln(sprintf('Simple took <info>%0.2f seconds</info> to run.', $time));
     }
 
@@ -236,6 +270,7 @@ final class ScanCommand extends SymfonyCommand
 
     /**
      * @return array<FileConfig>
+     *
      */
     private function getFiles(InputInterface $input): array
     {
@@ -245,13 +280,34 @@ final class ScanCommand extends SymfonyCommand
             $files = $this->config->getFiles();
         } else {
             if (is_string($files)) {
-                return [$files];
+                return [new FileConfig($files, true)];
             }
             if (is_bool($files)) {
                 throw new UnableToLoadConfigException('Unable to determine directory.', 10);
             }
             $files = array_map(static function (string $file): FileConfig {
                 return new FileConfig($file, true);
+            }, $files);
+        }
+
+        return $files;
+    }
+
+    private function getExclusions(InputInterface $input): array
+    {
+        $files = $input->getOption('exclude');
+
+        if (empty($files)) {
+            $files = $this->config->getExclusions();
+        } else {
+            if (is_string($files)) {
+                return [new ExcludeConfig($files, true)];
+            }
+            if (is_bool($files)) {
+                throw new UnableToLoadConfigException('Unable to determine directory.', 10);
+            }
+            $files = array_map(static function (string $file): ExcludeConfig {
+                return new ExcludeConfig($file, true);
             }, $files);
         }
 
