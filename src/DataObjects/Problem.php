@@ -38,4 +38,15 @@ final class Problem
             $this->line
         );
     }
+
+    public function toArray(): array
+    {
+        return [
+            'key'         => $this->key,
+            'weight'      => $this->weight,
+            'file_name'   => $this->fileName,
+            'line_number' => $this->lineNumber,
+            'line'        => (string) preg_replace('/<\/?[a-zA-Z=,]*>/', '', $this->line),
+        ];
+    }
 }
