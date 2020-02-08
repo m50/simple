@@ -6,9 +6,9 @@ files:
   - path: ./content/
     recursive: true
 exclude:
-  - pattern: vendor
+  - path: vendor
     file: false
-  - pattern: README.md
+  - path: README.md
     file: true
 extensions:
   - md

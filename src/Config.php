@@ -244,7 +244,9 @@ final class Config implements ConfigInterface
     {
         $this->files = [];
         foreach ($values as $value) {
+            /** @var string $path */
             $path = $value['path'];
+            /** @var bool $recursive */
             $recursive = $value['recursive'];
             $this->files[] = new FileConfig($path, $recursive);
         }
@@ -255,11 +257,13 @@ final class Config implements ConfigInterface
      */
     public function setExclusion(array $values): void
     {
-        $this->files = [];
+        $this->exclusions = [];
         foreach ($values as $value) {
-            $pattern = $value['pattern'];
+            /** @var string $path */
+            $path = $value['path'];
+            /** @var bool $file */
             $file = $value['file'];
-            $this->exclusions[] = new ExcludeConfig($pattern, $file);
+            $this->exclusions[] = new ExcludeConfig($path, $file);
         }
     }
 }
