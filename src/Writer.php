@@ -20,6 +20,7 @@ final class Writer
         if (static::$quiet) {
             return;
         }
+
         static::$output->writeln(static::sanitize($text));
     }
 
@@ -64,10 +65,17 @@ final class Writer
 
     public static function escape(string $text): string
     {
-        $of = new OutputFormatter();
-        return $of->escape($text);
+        return (new OutputFormatter())->escape($text);
     }
 
+    /**
+     * Remove all tags from string.
+     *
+     * @param string $text
+     * @return string
+     * @psalm-pure
+     * @psalm-mutation-free
+     */
     private static function sanitize(string $text): string
     {
         if (! static::$noColor) {
