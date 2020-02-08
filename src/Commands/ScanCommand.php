@@ -26,6 +26,8 @@ final class ScanCommand extends SymfonyCommand
     private static float $START_TIME = 0;
     protected static $defaultName = 'scan';
 
+    protected ?InputInterface $input = null;
+
     protected Config $config;
 
     private const OPTIONS = [
@@ -105,7 +107,7 @@ final class ScanCommand extends SymfonyCommand
         Writer::$output = $output;
         $this->handleConfig($input);
 
-        $files = $this->getFiles($input);
+        $files = $this->getFiles();
 
         $errors = [];
         foreach ($files as $file) {
@@ -182,7 +184,7 @@ final class ScanCommand extends SymfonyCommand
 
     private function handleExclusions(Finder &$finder): void
     {
-        $exclusions = $this->config->getExclusions();
+        $exclusions = $this->getExclusions();
 
         $excludeFiles = array_map(static function (ExcludeConfig $config): string {
             return $config->path();
@@ -212,8 +214,12 @@ final class ScanCommand extends SymfonyCommand
         Writer::$noProgressBar = (bool) ($input->getOption('no-progress-bar') ?? false);
 
         $this->config = new Config($this->getConfigFile($input));
+        $this->input = $input;
     }
 
+    /**
+     * @param array<Problem> $errors
+     */
     private function genReport(array $errors, InputInterface $input): void
     {
         $report = $this->config->getReport();
@@ -224,7 +230,7 @@ final class ScanCommand extends SymfonyCommand
         }
         $reportFormat = $this->getReportFormat($input, $reportFile) ?? $report->format();
 
-        switch ($reportFormat) {
+        switch (strtolower($reportFormat)) {
             case 'json':
                 JsonReport::generate($reportFile, $errors);
                 break;
@@ -272,9 +278,12 @@ final class ScanCommand extends SymfonyCommand
      * @return array<FileConfig>
      *
      */
-    private function getFiles(InputInterface $input): array
+    private function getFiles(): array
     {
-        $files = $input->getOption('files');
+        $files = [];
+        if (! is_null($this->input)) {
+            $files = $this->input->getOption('files');
+        }
 
         if (empty($files)) {
             $files = $this->config->getFiles();
@@ -293,9 +302,12 @@ final class ScanCommand extends SymfonyCommand
         return $files;
     }
 
-    private function getExclusions(InputInterface $input): array
+    private function getExclusions(): array
     {
-        $files = $input->getOption('exclude');
+        $files = [];
+        if (! is_null($this->input)) {
+            $files = $this->input->getOption('exclude');
+        }
 
         if (empty($files)) {
             $files = $this->config->getExclusions();
