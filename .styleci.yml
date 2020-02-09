@@ -6,9 +6,6 @@ enabled:
   - simplified_null_return
 finder:
   exclude:
-    - modules
-    - node_modules
-    - storage
     - vendor
     - tests
   name: "*.php"
