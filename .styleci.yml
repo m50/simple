@@ -3,7 +3,6 @@ risky: true
 enabled:
   - not_operator_with_successor_space
   - blank_line_before_return
-  - return_type_declaration
   - simplified_null_return
   - single_blank_line_at_eof
 finder:
