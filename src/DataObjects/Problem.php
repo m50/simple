@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NotSoSimple\DataObjects;
 
@@ -56,6 +58,7 @@ final class Problem
     {
         $errorClass = $this->weight < 3 ? 'bg=yellow;fg=black' : 'error';
         $close = $this->weight < 3 ? '' : 'error';
+
         return sprintf(
             "<{$errorClass}> %s(%d) </{$close}> in <info>%s</info>:<info>%d</info> \n    => %s\n",
             $this->key,
