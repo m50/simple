@@ -18,4 +18,7 @@ before_install:
 
 script:
   - vendor/bin/psalm --shepherd
-  - vendor/bin/phpunit --testdox
+  - phpdbg -qrr vendor/bin/phpunit --testdox --coverage-clover clover.xml
+
+after_success:
+  - travis_retry php vendor/bin/php-coveralls
