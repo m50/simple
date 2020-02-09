@@ -10,4 +10,5 @@ finder:
     - node_modules
     - storage
     - vendor
+    - tests
   name: "*.php"
