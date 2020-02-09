@@ -1,0 +1,7 @@
+CHANGELOG.md export-ignore
+*.yml export-ignore
+simple.example.yaml export-ignore
+Makefile export-ignore
+tests/ export-ignore
+phpunit.xml.dist export-ignore
+Dockerfile export-ignore
