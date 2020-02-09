@@ -22,9 +22,29 @@ final class Problem
         $this->lineNumber = $lineNumber;
     }
 
+    public function fileName(): string
+    {
+        return $this->fileName;
+    }
+
+    public function weight(): int
+    {
+        return $this->weight;
+    }
+
+    public function line(): string
+    {
+        return $this->line;
+    }
+
     public function lineNumber(): int
     {
         return $this->lineNumber;
+    }
+
+    public function key(): string
+    {
+        return $this->key;
     }
 
     public function format(): string
