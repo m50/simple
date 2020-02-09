@@ -4,6 +4,10 @@
 [![styleci status](https://github.styleci.io/repos/238022831/shield)](https://github.styleci.io/repos/238022831)
 [![Coverage Status](https://coveralls.io/repos/github/m50/simple/badge.svg?branch=master)](https://coveralls.io/github/m50/simple?branch=master)
 
+[![Latest Stable Version](https://poser.pugx.org/m50/simple/v/stable)](https://packagist.org/packages/m50/simple)
+[![Total Downloads](https://poser.pugx.org/m50/simple/downloads)](https://packagist.org/packages/m50/simple)
+[![License](https://poser.pugx.org/m50/simple/license)](https://packagist.org/packages/m50/simple)
+
 The documentation verification tool to make sure that nothing is considered easy or simple.
 
 Run *Simple* in your CI process on your documentation to make sure you don't put
