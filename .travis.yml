@@ -1,0 +1,22 @@
+dist: xenial
+language: php
+
+php:
+  - 7.3
+  - 7.4
+
+env:
+  matrix:
+    - COMPOSER_FLAGS="--prefer-lowest"
+    - COMPOSER_FLAGS=""
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+before_install:
+  - travis_retry composer update
+
+script:
+  - vendor/bin/psalm --shepard
+  - vendor/bin/phpunit --testdox
