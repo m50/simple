@@ -4,7 +4,6 @@ enabled:
   - not_operator_with_successor_space
   - blank_line_before_return
   - simplified_null_return
-  - single_blank_line_at_eof
 finder:
   exclude:
     - modules
@@ -12,4 +11,3 @@ finder:
     - storage
     - vendor
   name: "*.php"
-  not-name: "*.blade.php"
