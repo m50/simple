@@ -2,12 +2,14 @@
 <html>
 <head>
     <title>(Not so) Simple Report</title>
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v1.10.1/dist/alpine.js" defer></script>
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
-    <header>
-        
+    <header class="mb-10 p-10 bg-gray-800 text-white">
+        <h1 class="text-4xl">(Not so) Simple Report</h1>
     </header>
+    <div>
+        {{ $body }}
+    </div>
 </body>
 </html>
