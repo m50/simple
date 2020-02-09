@@ -17,7 +17,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function it_can_read_a_configuration_file()
+    public function it_can_read_a_configuration_file()
     {
         $config = new Config(static::$configPath);
 
