@@ -315,13 +315,13 @@ final class ScanCommand extends SymfonyCommand
             $files = $this->config->getExclusions();
         } else {
             if (is_string($files)) {
-                return [new ExcludeConfig($files, true)];
+                return [new ExcludeConfig($files, (bool)preg_match('/\.\w+$/', $files))];
             }
             if (is_bool($files)) {
                 throw new UnableToLoadConfigException('Unable to determine directory.', 10);
             }
             $files = array_map(static function (string $file): ExcludeConfig {
-                return new ExcludeConfig($file, true);
+                return new ExcludeConfig($file, (bool)preg_match('/\.\w+$/', $file));
             }, $files);
         }
 
