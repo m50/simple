@@ -17,5 +17,5 @@ before_install:
   - travis_retry composer update
 
 script:
-  - vendor/bin/psalm --shepard
+  - vendor/bin/psalm --shepherd
   - vendor/bin/phpunit --testdox
