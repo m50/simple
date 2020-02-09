@@ -55,7 +55,7 @@ Alternatively, it can be used with docker for CI builds or locally.
 
 ### Docker:
 
-The docker image is: `marisa50/simple`.
+The [docker image](https://hub.docker.com/r/marisa50/simple) is: `marisa50/simple`.
 
 To run simple on your docs:
 
