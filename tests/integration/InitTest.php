@@ -12,15 +12,17 @@ class InitTest extends TestCase
 {
     use TesterTrait;
 
-    public function testExecute()
+    /** @test */
+    function test_execute()
     {
         $application = new Application();
         $application->add(new InitCommand());
 
         $command = $application->find('init');
         $commandTester = new CommandTester($command);
-        $commandTester->execute([]);
+        $exitCode = $commandTester->execute([]);
+        $this->assertEquals(0, $exitCode);
         $output = $commandTester->getDisplay();
-        $this->assertRegexp('/Successfully generated simple\.yaml/', $output);
+        $this->assertStringContainsString('Successfully generated simple.yaml', $output);
     }
 }
