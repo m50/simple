@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NotSoSimple\DataObjects;
 
@@ -15,7 +17,7 @@ class Cwd
         if ($cwd === false) {
             throw new AccessDeniedException('Unable to access current working directory.', 21);
         }
-        
+
         return $cwd;
     }
 }

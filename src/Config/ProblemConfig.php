@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NotSoSimple\Config;
 
@@ -32,7 +34,7 @@ final class ProblemConfig implements ConfigInterface
     }
 
     /**
-     * @psalm-mutation-free 
+     * @psalm-mutation-free
      *
      * @return (int|string)[]
      *
@@ -52,7 +54,7 @@ final class ProblemConfig implements ConfigInterface
         if (preg_match($this->regex, $line)) {
             return true;
         }
-        
+
         return false;
     }
 }
