@@ -1,6 +1,6 @@
 <section class="py-5 px-10 bg-gray-200 rounded-lg border-black border my-10 mx-5">
     <div>
-        <span class="bg-red-600 text-white p-1 mr-3">{{ $key }}({{ $weight }})</span>
+        <span class="bg-{{ $color }}-600 text-white p-1 mr-3">{{ $key }}({{ $weight }})</span>
         in
         <a href="#{{ $fileName }}:{{ $lineNumber }}" name="{{ $fileName }}:{{ $lineNumber }}">
             <span class="ml-3 text-green-600">{{ $fileName }}</span>:<span class="text-green-600">{{ $lineNumber }}</span>

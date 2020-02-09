@@ -41,6 +41,9 @@ final class HtmlReport
         $eTpl = str_replace('{{ $fileName }}', $error->fileName(), $eTpl);
         $eTpl = str_replace('{{ $key }}', $error->key(), $eTpl);
 
+        $color = $error->weight() < 3 ? 'yellow' : 'red';
+        $eTpl = str_replace('{{ $color }}', $color, $eTpl);
+
         $eTpl = str_replace('{{ $lineNumber }}', (string) $error->lineNumber(), $eTpl);
         $eTpl = str_replace('{{ $weight }}', (string) $error->weight(), $eTpl);
 

@@ -37,6 +37,11 @@ final class Problem
         return $this->line;
     }
 
+    public function unformattedLine(): string
+    {
+        return (string) preg_replace('/<\/?[a-zA-Z=,]*>/', '', $this->line);
+    }
+
     public function lineNumber(): int
     {
         return $this->lineNumber;
@@ -49,8 +54,10 @@ final class Problem
 
     public function format(): string
     {
+        $errorClass = $this->weight < 3 ? 'bg=yellow;fg=black' : 'error';
+        $close = $this->weight < 3 ? '' : 'error';
         return sprintf(
-            "<error>%s(%d)</error> in <info>%s</info>:<info>%d</info> \n    => %s\n",
+            "<{$errorClass}> %s(%d) </{$close}> in <info>%s</info>:<info>%d</info> \n    => %s\n",
             $this->key,
             $this->weight,
             $this->fileName,
