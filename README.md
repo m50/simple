@@ -1,4 +1,7 @@
 # (Not so) ~~Simple~~
+![psalm type coverage](https://shepherd.dev/github/{username}/{repo}/coverage.svg)
+[![Build Status](https://travis-ci.org/m50/simple.svg?branch=master)](https://travis-ci.org/m50/simple)
+![styleci status](https://github.styleci.io/repos/238022831/shield)
 
 The documentation verification tool to make sure that nothing is considered easy or simple.
 
