@@ -26,5 +26,6 @@
 
     <php>
         <env name="ENVIRONMENT" value="testing" />
+        <env name="TEST_OUTPUT_DIR" value="./tests/output" />
     </php>
 </phpunit>
