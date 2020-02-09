@@ -8,7 +8,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\TesterTrait;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class CreateUserCommandTest extends TestCase
+class InitTest extends TestCase
 {
     use TesterTrait;
 
