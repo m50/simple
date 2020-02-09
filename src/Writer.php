@@ -75,8 +75,6 @@ final class Writer
      *
      * @param string $text
      * @return string
-     * @psalm-pure
-     * @psalm-mutation-free
      */
     private static function sanitize(string $text): string
     {
