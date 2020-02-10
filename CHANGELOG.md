@@ -1,3 +1,7 @@
+## v1.0.2
+
+- Fix bug where relative paths weren't working correctly in a phar.
+
 ## v1.0.1
 
 - Added tests & CI
