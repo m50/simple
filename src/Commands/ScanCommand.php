@@ -175,7 +175,7 @@ final class ScanCommand extends SymfonyCommand
 
         $this->handleExclusions($finder);
 
-        if (is_dir($file->path())) {
+        if ($file->isDir()) {
             $finder->name($extensions)->in($file->path());
         } else {
             $finder->name(basename($file->path()))->in(dirname($file->path()))->depth(0);
