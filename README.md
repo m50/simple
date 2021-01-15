@@ -33,6 +33,8 @@ Then you can just run it:
 simple
 ```
 
+![example image](imgs/example.png)
+
 or specify a specific directory:
 
 ```sh
