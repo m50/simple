@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Command;
+namespace NotSoSimple\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use NotSoSimple\Commands\InitCommand;

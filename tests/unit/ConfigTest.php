@@ -1,6 +1,6 @@
 <?php
 
-namespace NotSoSimple\Tests\Unit;
+namespace App\Tests\Unit;
 
 use NotSoSimple\Config;
 use NotSoSimple\Config\ExcludeConfig;
