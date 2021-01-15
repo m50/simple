@@ -57,4 +57,6 @@ jobs:
         run:  vendor/bin/phpunit --testdox --coverage-clover clover.xml
 
       - name: Publish to coveralls.io
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: php vendor/bin/php-coveralls --coverage_clover=clover.xml --json_path="coveralls.json"
