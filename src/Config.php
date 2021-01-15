@@ -177,7 +177,7 @@ final class Config implements ConfigInterface
      *      extensions: ?array<string>,
      *      files: ?array<array{path:string, recursive:bool}>,
      *      problems: ?array<array{weight: int, key: string, regex: string}>,
-     *      exclude: ?array<array{file: bool, pattern: string}>,
+     *      exclude: ?array<array{file: bool, path: string}>,
      *  } $config
      * @return void
      */
@@ -254,7 +254,7 @@ final class Config implements ConfigInterface
         }
     }
     /**
-     * @param array<array{pattern:string,file:bool}> $values
+     * @param array<array{path:string,file:bool}> $values
      * @return void
      */
     public function setExclusion(array $values): void
@@ -262,7 +262,7 @@ final class Config implements ConfigInterface
         $this->exclusions = [];
         foreach ($values as $value) {
             /** @var string $path */
-            $path = $value['pattern'];
+            $path = $value['path'];
             /** @var bool $file */
             $file = $value['file'];
             $this->exclusions[] = new ExcludeConfig($path, $file);
