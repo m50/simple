@@ -11,7 +11,7 @@ use NotSoSimple\DataObjects\Problem;
 
 final class JUnitReport
 {
-    private const SCHEMA = 'https://raw.githubusercontent.com/junit-team/'.
+    private const SCHEMA = 'https://raw.githubusercontent.com/junit-team/' .
         'junit5/r5.5.1/platform-tests/src/test/resources/jenkins-junit.xsd';
     private const XMLNS_XSI = 'http://www.w3.org/2001/XMLSchema-instance';
 
