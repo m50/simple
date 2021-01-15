@@ -43,9 +43,12 @@ class ScanTest extends TestCase
     {
         static::$commandTester->execute(['--files' => __DIR__ . '/../../README.md', '-e' => './vendor/']);
         $output = static::$commandTester->getDisplay();
-        $this->assertRegExp('/Scanning [\.\/a-z]+README.md.../', $output);
-        $this->assertRegExp('/Simple took \d\.\d+ seconds to run\./', $output);
-        $this->assertRegExp('/simple\(\d\)\s*in\s*[\.\/a-z]+README\.md:\d+\s*\n\s+\=\>/', $output);
+        $this->assertMatchesRegularExpression('/Scanning [\.\/a-z]+README.md.../', $output);
+        $this->assertMatchesRegularExpression('/Simple took \d\.\d+ seconds to run\./', $output);
+        $this->assertMatchesRegularExpression(
+            '/simple\(\d\)\s*in\s*[\.\/a-z]+README\.md:\d+\s*\n\s+\=\>/',
+            $output
+        );
     }
 
     /** @test */
