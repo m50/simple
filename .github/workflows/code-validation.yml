@@ -58,4 +58,5 @@ jobs:
       - name: Publish to coveralls.io
         uses: coverallsapp/github-action@v1.1.2
         with:
+          path-to-lcov: clover.xml
           github-token: ${{ github.token }}
