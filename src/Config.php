@@ -262,7 +262,7 @@ final class Config implements ConfigInterface
         $this->exclusions = [];
         foreach ($values as $value) {
             /** @var string $path */
-            $path = $value['path'];
+            $path = $value['pattern'];
             /** @var bool $file */
             $file = $value['file'];
             $this->exclusions[] = new ExcludeConfig($path, $file);
