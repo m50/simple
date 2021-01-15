@@ -254,7 +254,7 @@ final class ScanCommand extends SymfonyCommand
 
     private function outputTime(): void
     {
-        $time = (float) (microtime(true) - self::$START_TIME);
+        $time = microtime(true) - self::$START_TIME;
         Writer::writeln(sprintf('Simple took <info>%0.2f seconds</info> to run.', $time));
     }
 

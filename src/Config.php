@@ -73,7 +73,7 @@ final class Config implements ConfigInterface
              *      extensions: ?array<string>,
              *      files: ?array<array{path:string,recursive:bool}>,
              *      problems: ?array<array{weight:int,key:string,regex:string}>,
-             *      exclude: ?array<array{file:bool,pattern:string}>,
+             *      exclude: ?array<array{file:bool,path:string}>,
              *  }
              */
             $yaml = Yaml::parseFile($file);

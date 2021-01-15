@@ -28,7 +28,7 @@ final class FileConfig implements ConfigInterface
 
     public function path(): string
     {
-        return (string)str_replace($this->cwd, '.', $this->path);
+        return str_replace($this->cwd, '.', $this->path);
     }
 
     public function isDir(): bool
