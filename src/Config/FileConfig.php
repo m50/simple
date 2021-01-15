@@ -31,18 +31,12 @@ final class FileConfig implements ConfigInterface
         return str_replace($this->cwd, '.', $this->path);
     }
 
-    public function isDir(): bool
-    {
-        return is_dir($this->path);
-    }
-
     public function recursive(): bool
     {
         return $this->recursive;
     }
 
     /**
-     * @psalm-mutation-free
      * @return array{path:string,recursive:bool}
      */
     public function toArray(): array
