@@ -57,4 +57,4 @@ jobs:
         run:  vendor/bin/phpunit --testdox --coverage-clover clover.xml
 
       - name: Publish to coveralls.io
-        run: php vendor/bin/php-coveralls --coverage_clover=clover.xml
+        run: php vendor/bin/php-coveralls --coverage_clover=clover.xml --json_path="coveralls.json"
