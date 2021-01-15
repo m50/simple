@@ -1,6 +1,6 @@
 # (Not so) ~~Simple~~
 ![psalm type coverage](https://shepherd.dev/github/m50/simple/coverage.svg)
-[![Build Status](https://api.travis-ci.org/m50/simple.svg?branch=master)](https://travis-ci.org/m50/simple)
+![Code Validation](https://github.com/m50/simple/workflows/Code%20Validation/badge.svg)
 [![styleci status](https://github.styleci.io/repos/238022831/shield)](https://github.styleci.io/repos/238022831)
 [![Coverage Status](https://coveralls.io/repos/github/m50/simple/badge.svg?branch=master)](https://coveralls.io/github/m50/simple?branch=master)
 
