@@ -30,6 +30,10 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_PAT }}
 
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
@@ -39,9 +43,9 @@ jobs:
           push: true
           tags: |
             ${{ github.repository }}:latest
-            ${{ github.repository }}:${{ github.ref }}
+            ${{ github.repository }}:${{ steps.get_version.outputs.VERSION }}
             ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.ref }}
+            ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.VERSION }}
 
   phar:
     name: Build PHAR
