@@ -2,7 +2,7 @@
 ![psalm type coverage](https://shepherd.dev/github/m50/simple/coverage.svg)
 ![Code Validation](https://github.com/m50/simple/workflows/Code%20Validation/badge.svg)
 [![styleci status](https://github.styleci.io/repos/238022831/shield)](https://github.styleci.io/repos/238022831)
-[![Coverage Status](https://coveralls.io/repos/github/m50/simple/badge.svg?branch=master)](https://coveralls.io/github/m50/simple?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/m50/simple/badge.svg?branch=trunk)](https://coveralls.io/github/m50/simple?branch=trunk)
 
 [![Latest Stable Version](https://poser.pugx.org/m50/simple/v/stable)](https://packagist.org/packages/m50/simple)
 [![Total Downloads](https://poser.pugx.org/m50/simple/downloads)](https://packagist.org/packages/m50/simple)
