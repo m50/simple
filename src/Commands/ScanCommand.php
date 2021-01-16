@@ -8,7 +8,7 @@ use Exception;
 use NotSoSimple\Config;
 use NotSoSimple\Config\ExcludeConfig;
 use NotSoSimple\Writer;
-use NotSoSimple\FileReader;
+use NotSoSimple\ProblemFinder;
 use NotSoSimple\DataObjects\Cwd;
 use NotSoSimple\Config\FileConfig;
 use NotSoSimple\Reports\HtmlReport;
@@ -111,38 +111,40 @@ final class ScanCommand extends SymfonyCommand
 
         $files = $this->getFiles();
 
-        $errors = [];
+        $problems = [];
         foreach ($files as $file) {
             Writer::comment("Scanning <info>{$file->path()}</info>...");
-            $errors = array_merge($errors, $this->scan($file));
+            $problems = array_merge($problems, $this->scan($file));
         }
 
         Writer::writeln("\n");
 
         if (! $input->getOption('hide-results')) {
-            $this->writeErrors($errors);
+            $this->writeErrors($problems);
         }
 
-        $this->genReport($errors, $input);
+        $this->genReport($problems, $input);
 
         $this->outputTime();
 
-        return count($errors) > 0 ? 1 : 0;
+        return count($problems) > 0 ? 1 : 0;
     }
 
     /**
-     * @return array<Problem>
+     * @return Problem[]
+     *
+     * @psalm-return list<Problem>
      */
     private function scan(FileConfig $file): array
     {
         $problems = [];
 
-        $finder = $this->getFinder($file);
+        $fileList = $this->generateFileList($file);
 
-        Writer::pbStart(count($finder));
+        Writer::startProgressBar(count($fileList));
 
-        foreach ($finder as $file) {
-            Writer::pbAdvance();
+        foreach ($fileList as $file) {
+            Writer::advanceProgressBar();
             if (count($problems) > 0 && $this->config->shortcircuit()) {
                 continue;
             }
@@ -151,37 +153,37 @@ final class ScanCommand extends SymfonyCommand
             $contents = $file->getContents();
             $lines = explode("\n", $contents);
 
-            $freader = new FileReader($file->getPathname(), $lines, $this->config);
-            $problems = array_merge($problems, $freader->read()->getErrors());
+            $problemFinder = new ProblemFinder($file->getPathname(), $lines, $this->config);
+            $problems = array_merge($problems, $problemFinder->findErrors());
         }
 
-        Writer::pbFinish();
+        Writer::finishProgressBar();
 
         return $problems;
     }
 
-    private function getFinder(FileConfig $file): Finder
+    private function generateFileList(FileConfig $file): Finder
     {
         $extensions = array_map(static function (string $ext): string {
             return '*.' . $ext;
         }, $this->config->getExtensions());
 
-        $finder = new Finder();
-        $finder->ignoreUnreadableDirs()->files();
+        $fileFinder = new Finder();
+        $fileFinder->ignoreUnreadableDirs()->files();
 
         if (! $file->recursive()) {
-            $finder->depth(0);
+            $fileFinder->depth(0);
         }
 
-        $this->handleExclusions($finder);
+        $this->handleExclusions($fileFinder);
 
         if (is_dir($file->path())) {
-            $finder->name($extensions)->in($file->path());
+            $fileFinder->name($extensions)->in($file->path());
         } else {
-            $finder->name(basename($file->path()))->in(dirname($file->path()))->depth(0);
+            $fileFinder->name(basename($file->path()))->in(dirname($file->path()))->depth(0);
         }
 
-        return $finder;
+        return $fileFinder;
     }
 
     private function handleExclusions(Finder &$finder): void

@@ -6,23 +6,20 @@ namespace NotSoSimple;
 
 use NotSoSimple\DataObjects\Problem;
 
-final class FileReader
+final class ProblemFinder
 {
     private string $fileName;
 
-    /** @var array<\NotSoSimple\Config\ProblemConfig> */
+    /** @var list<\NotSoSimple\Config\ProblemConfig> */
     private static array $problemConfigs = [];
 
-    /** @var array<string> */
+    /** @var list<string> */
     private array $lines = [];
 
     private Config $config;
 
-    /** @var array<Problem> */
-    private array $problems = [];
-
     /**
-     * @param array<string> $lines
+     * @param list<string> $lines
      */
     public function __construct(string $fileName, array $lines, Config $config)
     {
@@ -31,9 +28,15 @@ final class FileReader
         $this->config = $config;
     }
 
-    public function read(): self
+    /**
+     * @return Problem[]
+     *
+     * @psalm-return list<Problem>
+     */
+    public function findErrors(): array
     {
         $lineNumber = 0;
+        $problems = [];
         foreach ($this->lines as $line) {
             $lineNumber++;
 
@@ -41,36 +44,33 @@ final class FileReader
                 continue;
             }
 
-            $this->scanLine($line, $lineNumber);
+            $problems = array_merge($problems, $this->scanLine($line, $lineNumber));
 
-            if ($this->config->shortcircuit() && count($this->problems) > 0) {
+            if ($this->config->shortcircuit() && count($problems) > 0) {
                 break;
             }
         }
 
-        return $this;
+        return $problems;
     }
 
     /**
      * @return Problem[]
      *
-     * @psalm-return array<array-key, Problem>
+     * @psalm-return list<Problem>
      */
-    public function getErrors(): array
-    {
-        return $this->problems;
-    }
-
-    private function scanLine(string $line, int $lineNumber): void
+    private function scanLine(string $line, int $lineNumber): array
     {
         if (empty(self::$problemConfigs)) {
             self::$problemConfigs = $this->config->getProblems();
         }
 
+        $problems = [];
+
         foreach (self::$problemConfigs as $problemConfig) {
             if ($problemConfig->scanLine($line)) {
                 $highlightedLine = preg_replace($problemConfig->regex(), "<fg=red>\\0</>", Writer::escape($line));
-                $this->problems[] = new Problem(
+                $problems[] = new Problem(
                     $this->fileName,
                     $problemConfig->key(),
                     $problemConfig->weight(),
@@ -82,5 +82,7 @@ final class FileReader
                 }
             }
         }
+
+        return $problems;
     }
 }

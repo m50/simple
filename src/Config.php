@@ -28,7 +28,7 @@ final class Config implements ConfigInterface
     /** @var array<ExcludeConfig> */
     private array $exclusions = [];
 
-    /** @var array<ProblemConfig> */
+    /** @var list<ProblemConfig> */
     private array $problems = [];
 
     /** @var array<string> */
@@ -72,7 +72,7 @@ final class Config implements ConfigInterface
              *      report: ?array<string,string>,
              *      extensions: ?array<string>,
              *      files: ?array<array{path:string,recursive:bool}>,
-             *      problems: ?array<array{weight:int,key:string,regex:string}>,
+             *      problems: ?list<array{weight:int,key:string,regex:string}>,
              *      exclude: ?array<array{file:bool,path:string}>,
              *  }
              */
@@ -135,7 +135,7 @@ final class Config implements ConfigInterface
     }
 
     /**
-     * @return array<ProblemConfig>
+     * @return list<ProblemConfig>
      */
     public function getProblems(): array
     {
@@ -176,7 +176,7 @@ final class Config implements ConfigInterface
      *      report: ?array<string,string>,
      *      extensions: ?array<string>,
      *      files: ?array<array{path:string, recursive:bool}>,
-     *      problems: ?array<array{weight: int, key: string, regex: string}>,
+     *      problems: ?list<array{weight: int, key: string, regex: string}>,
      *      exclude: ?array<array{file: bool, path: string}>,
      *  } $config
      * @return void

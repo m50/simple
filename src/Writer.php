@@ -26,7 +26,7 @@ final class Writer
         static::$output->writeln(static::sanitize($text));
     }
 
-    public static function pbStart(int $max = 1): void
+    public static function startProgressBar(int $max = 1): void
     {
         if (static::$quiet || static::$noProgressBar) {
             return;
@@ -35,7 +35,7 @@ final class Writer
         static::$pb = new ProgressBar(static::$output, $max);
     }
 
-    public static function pbAdvance(int $step = 1): void
+    public static function advanceProgressBar(int $step = 1): void
     {
         if (static::$quiet || static::$noProgressBar) {
             return;
@@ -46,7 +46,7 @@ final class Writer
         }
     }
 
-    public static function pbFinish(): void
+    public static function finishProgressBar(): void
     {
         if (static::$quiet || static::$noProgressBar) {
             return;
