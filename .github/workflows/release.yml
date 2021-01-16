@@ -5,7 +5,7 @@ on:
 
 jobs:
   container:
-    name: Build and Deploy Container
+    name: Build and Deploy Container and Phar
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,30 +29,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_PAT }}
-
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-
-      - name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
-          push: true
-          tags: |
-            ${{ github.repository }}:latest
-            ${{ github.repository }}:${{ steps.get_version.outputs.VERSION }}
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.VERSION }}
-
-  phar:
-    name: Build PHAR
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -93,3 +69,20 @@ jobs:
           asset_path: ./simple.phar
           asset_name: simple.phar
           asset_content_type: application/octet-stream
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
+          push: true
+          tags: |
+            ${{ github.repository }}:latest
+            ${{ github.repository }}:${{ steps.get_version.outputs.VERSION }}
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.VERSION }}
