@@ -28,5 +28,5 @@ abstract class Report
      *
      * @psalm-param list<\NotSoSimple\DataObjects\Problem> $problems
      */
-    public abstract function generate(string $file, array $problems): void;
+    abstract public function generate(string $file, array $problems): void;
 }
