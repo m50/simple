@@ -65,7 +65,7 @@ final class Writer
         if (static::$quiet) {
             return;
         }
-        
+
         static::$output->writeln(static::sanitize("<comment>{$comment}</comment>"));
     }
 
