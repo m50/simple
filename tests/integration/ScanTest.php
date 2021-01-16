@@ -81,6 +81,7 @@ class ScanTest extends TestCase
             '--files' => __DIR__ . '/../../README.md',
             '-e' => './vendor/',
             '--report-file' => static::$outputDir . '/report.json',
+            '--no-color',
         ]);
 
         $this->assertFileExists(static::$outputDir . '/report.json');
