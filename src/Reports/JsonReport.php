@@ -7,22 +7,22 @@ namespace NotSoSimple\Reports;
 use NotSoSimple\DataObjects\Problem;
 use NotSoSimple\Writer;
 
-final class JsonReport
+final class JsonReport extends Report
 {
     /**
      * Generate a JSON report.
      *
      * @param string $file
-     * @param array $errors
+     * @param array $problems
      * @return void
      *
-     * @psalm-param array<\NotSoSimple\DataObjects\Problem> $errors
+     * @psalm-param array<\NotSoSimple\DataObjects\Problem> $problems
      */
-    public static function generate(string $file, array $errors): void
+    public function generate(string $file, array $problems): void
     {
         $toArray = array_map(static function (Problem $problem): array {
             return $problem->toArray();
-        }, $errors);
+        }, $problems);
 
         $json = json_encode($toArray, JSON_PRETTY_PRINT);
 

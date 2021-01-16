@@ -21,6 +21,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use NotSoSimple\Exceptions\UnableToLoadConfigException;
+use NotSoSimple\Reports\Report;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 final class ScanCommand extends SymfonyCommand
@@ -123,7 +124,7 @@ final class ScanCommand extends SymfonyCommand
             $this->writeErrors($problems);
         }
 
-        $this->genReport($problems, $input);
+        $this->generateReport($problems, $input);
 
         $this->outputTime();
 
@@ -222,9 +223,9 @@ final class ScanCommand extends SymfonyCommand
     }
 
     /**
-     * @param array<Problem> $errors
+     * @param list<Problem> $problems
      */
-    private function genReport(array $errors, InputInterface $input): void
+    private function generateReport(array $problems, InputInterface $input): void
     {
         $report = $this->config->getReport();
         /** @var string|null $reportFile */
@@ -234,16 +235,7 @@ final class ScanCommand extends SymfonyCommand
         }
         $reportFormat = $this->getReportFormat($input, $reportFile) ?? $report->format();
 
-        switch (strtolower($reportFormat)) {
-            case 'json':
-                JsonReport::generate($reportFile, $errors);
-                break;
-            case 'junit':
-                JUnitReport::generate($reportFile, $errors);
-                break;
-            case 'html':
-                HtmlReport::generate($reportFile, $errors);
-        }
+        Report::getFormat($reportFormat)->generate($reportFile, $problems);
     }
 
     /** @param array<Problem> $errors */

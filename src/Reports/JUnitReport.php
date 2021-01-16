@@ -6,10 +6,9 @@ namespace NotSoSimple\Reports;
 
 use DOMDocument;
 use DOMElement;
-use DOMEntity;
 use NotSoSimple\DataObjects\Problem;
 
-final class JUnitReport
+final class JUnitReport extends Report
 {
     private const SCHEMA = 'https://raw.githubusercontent.com/junit-team/' .
         'junit5/r5.5.1/platform-tests/src/test/resources/jenkins-junit.xsd';
@@ -19,34 +18,34 @@ final class JUnitReport
      * Generate an HTML report.
      *
      * @param string $file
-     * @param array $errors
+     * @param array<\NotSoSimple\DataObjects\Problem> $problems
      * @return void
      *
-     * @psalm-param array<\NotSoSimple\DataObjects\Problem> $errors
+     * @psalm-param list<\NotSoSimple\DataObjects\Problem> $problems
      */
-    public static function generate(string $file, array $errors): void
+    public function generate(string $file, array $problems): void
     {
-        file_put_contents($file, self::genDom($errors)->saveXML());
+        file_put_contents($file, $this->generateDom($problems)->saveXML());
     }
 
     /**
-     * @psalm-param array<\NotSoSimple\DataObjects\Problem> $errors
+     * @psalm-param list<\NotSoSimple\DataObjects\Problem> $problems
      */
-    private static function genDom(array $errors): DOMDocument
+    private function generateDom(array $problems): DOMDocument
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
 
         /** @var array<string,array{errors:array,warnings:array}> $tests */
-        $tests = self::errortsToTests($errors);
+        $tests = $this->problemsToTests($problems);
 
-        $suite = self::genTestsuite($dom, $tests);
+        $suite = $this->generateTestsuite($dom, $tests);
 
         $suites = $dom->createElement('testsuites');
         $suites->appendChild($suite);
         $dom->appendChild($suites);
 
-        if (count($errors) === 0) {
+        if (count($problems) === 0) {
             $testcase = $dom->createElement('testcase');
             $testcase->setAttribute('name', 'simple');
             $suite->appendChild($testcase);
@@ -67,7 +66,7 @@ final class JUnitReport
             foreach (['errors', 'warnings'] as $type) {
                 /** @var array $error */
                 foreach ($opt[$type] as $error) {
-                    $testcase = self::genTestcase($dom, $fname, $error);
+                    $testcase = $this->generateTestcase($dom, $fname, $error);
                     $testsuite->appendChild($testcase);
                 }
             }
@@ -78,7 +77,7 @@ final class JUnitReport
         return $dom;
     }
 
-    private static function genTestcase(DOMDocument $dom, string $fileName, array $error): DOMElement
+    private function generateTestcase(DOMDocument $dom, string $fileName, array $error): DOMElement
     {
         $testcase = $dom->createElement('testcase');
         $testcase->setAttribute('name', "{$fileName}:{$error['line_number']}");
@@ -105,7 +104,7 @@ final class JUnitReport
      * @psalm-param array<string,array{errors:array,warnings:array}> $tests
      * @return DOMElement
      */
-    private static function genTestsuite(DOMDocument $dom, array $tests): DOMElement
+    private static function generateTestsuite(DOMDocument $dom, array $tests): DOMElement
     {
         $tErrorsCt = 0;
         $tWarningsCt = 0;
@@ -131,7 +130,7 @@ final class JUnitReport
      * @psalm-return array<string, array<string, list<array>>>
      * @return array[][][]
      */
-    private static function errortsToTests(array $errors): array
+    private function problemsToTests(array $errors): array
     {
         $tests = [];
 
@@ -144,13 +143,13 @@ final class JUnitReport
                 ];
             }
             $type = $error->weight() < 3 ? 'warnings' : 'errors';
-            $tests[$error->fileName()][$type][] = static::genEntry($error);
+            $tests[$error->fileName()][$type][] = $this->generateEntry($error);
         }
 
         return $tests;
     }
 
-    private static function genEntry(Problem $error): array
+    private function generateEntry(Problem $error): array
     {
         return [
             'key' => $error->key(),
