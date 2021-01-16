@@ -9,13 +9,15 @@ abstract class Report
     public static function getFormat(string $reportFormat): Report
     {
         switch (strtolower($reportFormat)) {
-            default:
             case 'json':
                 return new JsonReport();
             case 'junit':
                 return new JUnitReport();
             case 'html':
                 return new HtmlReport();
+            default:
+            case 'null':
+                return new NullReport();
         }
     }
 
