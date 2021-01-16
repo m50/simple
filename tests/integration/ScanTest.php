@@ -23,7 +23,7 @@ class ScanTest extends TestCase
         $application = new Application();
         $application->add(new ScanCommand());
 
-        $command = $application->find('scan');
+        $command = new ScanCommand('scan');
         static::$commandTester = new CommandTester($command);
 
         static::$outputDir = getenv('TEST_OUTPUT_DIR') ?: __DIR__;
