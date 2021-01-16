@@ -26,7 +26,7 @@ class ScanTest extends TestCase
         $command = $application->find('scan');
         static::$commandTester = new CommandTester($command);
 
-        static::$outputDir = getenv('TEST_OUTPUT_DIR') ?? __DIR__;
+        static::$outputDir = getenv('TEST_OUTPUT_DIR') ?: __DIR__;
     }
 
     public function tearDown(): void
@@ -43,6 +43,29 @@ class ScanTest extends TestCase
     {
         static::$commandTester->execute(['--files' => __DIR__ . '/../../README.md', '-e' => './vendor/']);
         $output = static::$commandTester->getDisplay();
+        $this->assertStringContainsString('1/1 [============================] 100%', $output);
+        $this->assertMatchesRegularExpression('/Scanning [\.\/a-z]+README.md.../', $output);
+        $this->assertMatchesRegularExpression('/Simple took \d\.\d+ seconds to run\./', $output);
+        $this->assertMatchesRegularExpression(
+            '/simple\(\d\)\s*in\s*[\.\/a-z]+README\.md:\d+\s*\n\s+\=\>/',
+            $output
+        );
+    }
+
+    /** @test */
+    function test_execute_quiet()
+    {
+        static::$commandTester->execute(['--files' => __DIR__ . '/../../README.md', '-e' => './vendor/', '--quiet' => true]);
+        $this->assertEquals(1, static::$commandTester->getStatusCode());
+        $output = static::$commandTester->getDisplay();
+    }
+
+    /** @test */
+    function test_execute_no_progress_bar()
+    {
+        static::$commandTester->execute(['--files' => __DIR__ . '/../../README.md', '-e' => './vendor/', '--no-progress-bar' => true]);
+        $output = static::$commandTester->getDisplay();
+        $this->assertStringNotContainsString('1/1 [============================] 100%', $output);
         $this->assertMatchesRegularExpression('/Scanning [\.\/a-z]+README.md.../', $output);
         $this->assertMatchesRegularExpression('/Simple took \d\.\d+ seconds to run\./', $output);
         $this->assertMatchesRegularExpression(

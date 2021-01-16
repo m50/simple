@@ -62,6 +62,10 @@ final class Writer
 
     public static function comment(string $comment): void
     {
+        if (static::$quiet) {
+            return;
+        }
+        
         static::$output->writeln(static::sanitize("<comment>{$comment}</comment>"));
     }
 
