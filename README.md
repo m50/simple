@@ -70,7 +70,7 @@ The [docker image](https://hub.docker.com/r/marisa50/simple) is: `marisa50/simpl
 To run simple on your docs:
 
 ```sh
-docker run --rm --interactive --tty -v $(pwd):/app -w="/app" ghcr.io/m50/simple:latest
+docker run --rm --interactive --tty -v "$(pwd):/app" -w="/app" ghcr.io/m50/simple:latest
 ```
 
 ### Phar:
