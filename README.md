@@ -70,13 +70,13 @@ The [docker image](https://hub.docker.com/r/marisa50/simple) is: `marisa50/simpl
 To run simple on your docs:
 
 ```sh
-docker run --rm --interactive --tty --volume $PWD:/app m50/simple:latest
+docker run --rm --interactive --tty --volume $PWD:/app ghcr.iom50/simple:latest
 ```
 
 ### Phar:
 
 ```sh
-wget -O simple.phar $SIMPLE_DOWNLOAD_PATH
+wget -O simple.phar $(curl -s https://api.github.com/repos/m50/simple/releases/latest | jq -aM .assets[0].browser_download_url | tr -d '"')
 chmod 755 simple.phar
 mv simple.phar /usr/local/bin/simple
 ```
