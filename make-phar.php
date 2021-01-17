@@ -9,9 +9,6 @@ $pharFile = 'simple.phar';
 if (file_exists($pharFile)) {
     unlink($pharFile);
 }
-if (file_exists($pharFile . '.gz')) {
-    unlink($pharFile . '.gz');
-}
 
 // create phar
 $p = new Phar($pharFile);
@@ -31,8 +28,5 @@ $stub = "#!/usr/bin/env php\n" . $stub;
 $p->setStub($stub);
 
 $p->stopBuffering();
-
-// plus - compressing it into gzip
-$p->compress(Phar::GZ);
 
 echo "$pharFile successfully created\n";
