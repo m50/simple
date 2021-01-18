@@ -35,7 +35,7 @@ final class ReportConfig implements ConfigInterface
     /**
      * @psalm-mutation-free
      *
-     * @return string[]|null
+     * @return string[]
      *
      * @psalm-return array{format: string, output: string}
      */
